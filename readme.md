@@ -211,15 +211,4 @@ The API runs at `http://localhost:5000`.
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
----
-
-## License
-
-This project is licensed under the **MIT License**.
-
-```
-
----
-
-If you want, I can also create a **more visually appealing version with badges, diagrams, and a clean table for supported languages** that would look great on GitHub. Do you want me to do that?
 ```
